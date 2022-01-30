@@ -2,7 +2,8 @@ from fastapi import APIRouter
 
 from schemas.WorkHoursSchema import (
     create_checkin_user,
-    doing_checkout_user
+    doing_checkout_user,
+    calculate_working_hours
 )
 
 from models.WorkingHoursModels import (
@@ -21,4 +22,9 @@ def check_in(id):
 def check_out(id):
     checkout = doing_checkout_user(id)
     return ResponseModel(checkout,"User checked-out successfully")
+
+@rou.get('/workhours/{id}')
+def work_hours(id):
+    workhrs = calculate_working_hours(id)
+    return ResponseModel(workhrs, "Work Hours calculated successfully")
     
