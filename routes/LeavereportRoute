@@ -1,0 +1,13 @@
+from fastapi import APIRouter
+from models.LeaveModels import ApplyLeave
+from models.LeaveModels import LeaveReport
+from config.db import leavereportdb
+from schemas.leaveschema import serializeDict, serializeList
+from bson import ObjectId
+report = APIRouter()
+
+@report.get('/{id}/report')
+async def gen_report(id,emp_report: LeaveReport ):
+    serializeDict(leavereportdb.find_one({"_id":ObjectId(id)}))
+
+    

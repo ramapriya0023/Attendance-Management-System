@@ -1,14 +1,15 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter
 from models.LeaveModels import ApplyLeave
-from models.LeaveModels import LeaveTypes
+from models.LeaveModels import LeaveReport
 from config.db import leavedb
-from schemas.leaveschema import serializeDict, serializeList
+from schemas.leaveschema import serializeDict, serializeList, updateReport
 from bson import ObjectId
 leaveroute = APIRouter()
 
 @leaveroute.post('/applyleave')
 async def create_leave(leave: ApplyLeave):
     leavedb.insert_one(dict(leave))
+    updateReport(leave["id"],leave["reason"])
     return "Leave applied"
 
 @leaveroute.get('/{id}/leaveapplied')

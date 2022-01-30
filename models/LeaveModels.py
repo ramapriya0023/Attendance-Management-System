@@ -7,11 +7,10 @@ class ApplyLeave(BaseModel):
     reason: str
     status: Optional[str]
 
-class LeaveTypes(BaseModel):
+class LeaveReport(BaseModel):
     id: str
     firstName: str
-    reason: str
-    paidLeave: int
-    medicalLeave: int
-    privilegeLeave: int
-    lossofPay: int
+    paidleave: int
+    medicalleave: int
+    privilegeleave: int
+    lossofpay: int

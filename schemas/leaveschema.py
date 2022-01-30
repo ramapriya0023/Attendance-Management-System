@@ -1,12 +1,28 @@
+from config.db import leavereportdb
+from config.db import leavedb
+from bson import ObjectId
+
 def leaveEntity(item) -> dict:
     return {
         "id":str(item["_id"]),
-        "firstname":item["firstname"],
+        "firstName":item["firstName"],
         "reason":item["reason"]
     }
 
+def reportEntity(item) -> dict:
+    return{
+        "id":str(item["_id"]),
+        "firstName": item["firstName"],
+        "paidLeave": item["paidLeave"],
+        "medicalLeave": item["medicalLeave"],
+        "privilegeLeave": item["privilegeLeave"],
+        "lossofPay": item["lossofPay"]
+    }
 def leavesEntity(entity) -> list:
-    return [leaveEntity(item) for item in entity]
+    if (leaveEntity):
+        return [leaveEntity(item) for item in entity]
+    else:
+        return [reportEntity(item) for item in entity]
 #Best way
 
 def serializeDict(a) -> dict:
@@ -14,3 +30,18 @@ def serializeDict(a) -> dict:
 
 def serializeList(entity) -> list:
     return [serializeDict(a) for a in entity]
+
+def createReport(id):
+    reportdict={}
+    emp=leavedb.find_one({"_id":ObjectId(id)})
+    reportdict["id"]=id
+    reportdict["firstName"]=emp["firstName"]
+    reportdict["paidleave"]=0
+    reportdict["medicalleave"]=0
+    reportdict["privilegeleave"]=0
+    reportdict["lossofpay"]=0
+    leavereportdb.insert_one(reportdict)
+
+def updateReport(id,reason):
+    empreport=leavereportdb.find_one({"_id":ObjectId(id)})
+    #leavedb.find_one_and_update({"_id":ObjectId(id)},{ "$set":{"status": status}})

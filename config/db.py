@@ -6,6 +6,6 @@ client=MongoClient("mongodb+srv://m001-student:m001-mongodb-basics@sandbox.76ha4
 #MONGO_DETAILS = config("mongodb+srv://m001-student:m001-mongodb-basics@sandbox.76ha4.mongodb.net/AttendanceManagement")
 #client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_DETAILS)
 database = client.LeaveApplication
-leavelogdb = database.get_collection("LeaveLog")
+leavereportdb = database.get_collection("LeaveReports")
 leavedb=database.get_collection("AppliedLeave")
 userdb=database.get_collection("UserDb")
