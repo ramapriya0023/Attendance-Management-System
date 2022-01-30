@@ -9,3 +9,4 @@ database = client.LeaveApplication
 leavereportdb = database.get_collection("LeaveReports")
 leavedb=database.get_collection("AppliedLeave")
 userdb=database.get_collection("UserDb")
+workhrs = database.get_collection("WorkingHours")
