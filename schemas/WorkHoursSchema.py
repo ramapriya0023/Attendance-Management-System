@@ -8,12 +8,16 @@ from models.WorkingHoursModels import CheckIn
 
 
 
-# def user_helper(user) -> dict:
-#     return {
-#         "autoid":user["autoid"],
-#         "fullname": user["fullname"],
-#         "checkin": user["checkin"]        
-#     }
+def user_helper(user) -> dict:
+    return {
+        "autoid":user["autoid"],
+        "fullname": user["name"],
+        "checkin": user["checkin"],
+        "checkout":user["checkout"],
+        "hours":user["hours"],
+        "minutes":user["minutes"],
+        "seconds":user["seconds"]        
+    }
 
 def create_checkin_user(id:str):
     user = userdb.find_one({"autoid":id})
@@ -48,5 +52,9 @@ def calculate_working_hours(id:str):
     workhrs.update_one({"autoid":id},{"$set":data})
     return "Hours : "+str(hour)+", Minutes : "+str(minutes)+", Seconds : "+str(seconds)
 
+def report_work_hours(id:str) -> dict:
+    user =  workhrs.find_one({"autoid": id})
+    if user:
+        return user_helper(user)
     
     
