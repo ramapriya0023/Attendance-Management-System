@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 from models.LeaveModels import ApplyLeave
-from models.LeaveModels import LeaveReport
-from config.db import leavedb
+from config.db import leavedb, leavereportdb
 from schemas.leaveschema import serializeDict, serializeList, updateReport
 from bson import ObjectId
 leaveroute = APIRouter()
@@ -29,3 +28,7 @@ async def view_leaves():
 async def delete_leave():
     leavedb.find_one_and_delete({"_id":ObjectId(id)})
     return "Leave has been deleted"
+
+@leaveroute.get('/{id}/report')
+async def gen_report(id):
+    return serializeDict(leavereportdb.find_one({"_id":ObjectId(id)}))

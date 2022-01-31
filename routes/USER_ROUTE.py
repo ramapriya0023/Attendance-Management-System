@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Body
 from fastapi.encoders import jsonable_encoder
+from schemas.leaveschema import createReport
+from config.db import leavereportdb
 
 from schemas.userSchema import (
     add_user,
@@ -22,6 +24,7 @@ router = APIRouter()
 def add_user_data(user: User = Body(...)):
     user = jsonable_encoder(user)
     new_user =  add_user(user)
+    createReport(new_user["id"],new_user["fullname"])
     return ResponseModel(new_user, "user added successfully.")
 
 
