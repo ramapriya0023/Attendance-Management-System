@@ -23,8 +23,6 @@ def user_helper(user) -> dict:
     }
 
 #"phonenumber": user["phonenumber"],"totalleaves":user["totalleaves"],
-
-
 # crud operations
 
 # Retrieve all users present in the database
@@ -37,7 +35,7 @@ def retrieve_users():
 
 # Add a new user into to the database
 def add_user(user_data: dict) -> dict:
-    user_data.__setitem__("autoid",Resource)
+    #user_data.__setitem__("autoid",Resource)
     user =  userdb.insert_one(user_data)
     new_user =  userdb.find_one({"_id": user.inserted_id})
     return user_helper(new_user)
@@ -63,7 +61,6 @@ def update_user(id: str, data: dict):
         if updated_user:
             return True
         return False
-
 
 # Delete a user from the database
 def delete_user(id: str):

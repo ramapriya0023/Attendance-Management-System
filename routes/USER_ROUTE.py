@@ -24,7 +24,7 @@ router = APIRouter()
 def add_user_data(user: User = Body(...)):
     user = jsonable_encoder(user)
     new_user =  add_user(user)
-    createReport(new_user["id"],new_user["fullname"])
+    createReport(new_user["autoid"],new_user["fullname"])
     return ResponseModel(new_user, "user added successfully.")
 
 

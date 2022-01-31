@@ -2,12 +2,12 @@ from pydantic import BaseModel
 from typing import Optional
 
 class ApplyLeave(BaseModel):
-    id: str
+    autoid: str
     reason: str
     status: Optional[str]
 
 class LeaveReport(BaseModel):
-    id: str
+    autoid: str
     name: str
     paidleave: int
     medicalleave: int

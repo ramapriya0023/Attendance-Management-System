@@ -4,19 +4,21 @@ from bson import ObjectId
 
 def leaveEntity(item) -> dict:
     return {
-        "id":str(item["_id"]),
-        "reason":item["reason"]
+        "autoid":str(item["autoid"]),
+        "reason":item["reason"],
+        "status":item["status"]
     }
 
 def reportEntity(item) -> dict:
     return{
-        "id":str(item["_id"]),
+        "autoid":str(item["autoid"]),
         "name": item["name"],
         "paidleave": item["paidleave"],
         "medicalleave": item["medicalleave"],
         "privilegeleave": item["privilegeleave"],
         "lossofpay": item["lossofpay"]
     }
+
 def leavesEntity(entity) -> list:
     if (leaveEntity):
         return [leaveEntity(item) for item in entity]
@@ -25,15 +27,14 @@ def leavesEntity(entity) -> list:
 #Best way
 
 def serializeDict(a) -> dict:
-    return {**{i:str(a[i]) for i in a if i=='_id'},**{i:a[i] for i in a if i!='_id'}}
+    return {**{i:str(a[i]) for i in a if i=='id'},**{i:a[i] for i in a if i!='id'}}
 
 def serializeList(entity) -> list:
     return [serializeDict(a) for a in entity]
 
 def createReport(id,name):
     reportdict={}
-    emp=leavedb.find_one({"_id":ObjectId(id)})
-    reportdict["id"]=id
+    reportdict["autoid"]=id
     reportdict["name"]=name
     reportdict["paidleave"]=0
     reportdict["medicalleave"]=0
@@ -42,8 +43,9 @@ def createReport(id,name):
     leavereportdb.insert_one(reportdict)
 
 def updateReport(id,reason):
-    empreport=leavereportdb.find_one({"_id":ObjectId(id)})
-    for key in dict(empreport).keys:
+    empreport=leavereportdb.find_one({"autoid":id})
+    empreport=dict(empreport)
+    for key,value in empreport.items():
         if key==reason:
-            num=empreport[key]+1
-    leavedb.find_one_and_update({"_id":ObjectId(id)},{ "$set":{reason:key }})
+            num=value+1
+    leavereportdb.find_one_and_update({"autoid":id},{ "$set":{reason:num }})
