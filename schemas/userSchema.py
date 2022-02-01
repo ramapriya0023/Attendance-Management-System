@@ -2,6 +2,12 @@
 from bson.objectid import ObjectId
 from config.db import userdb
 from schemas.idGenerator import Resource
+from models.User import UserLoginSchema
+
+
+
+
+
 
 
 # helpers
@@ -13,7 +19,7 @@ def user_helper(user) -> dict:
         "autoid":user["autoid"],
         "fullname": user["fullname"],
         "email": user["email"],
-        
+       
         "dob":user["dob"],
         "experiance":user["experiance"],
         "status":user["status"],
@@ -23,9 +29,12 @@ def user_helper(user) -> dict:
     }
 
 #"phonenumber": user["phonenumber"],"totalleaves":user["totalleaves"],
+
+
 # crud operations
 
 # Retrieve all users present in the database
+
 def retrieve_users():
     users = []
     for user in userdb.find():
@@ -62,9 +71,20 @@ def update_user(id: str, data: dict):
             return True
         return False
 
+
 # Delete a user from the database
 def delete_user(id: str):
     user =  userdb.find_one({"autoid": id})
     if user:
         userdb.delete_one({"autoid": id})
         return True
+
+
+def check_user(data: UserLoginSchema):
+    #users=retrieve_users()
+    #print(users)
+    for user in userdb.find():
+        print("Here is_________________________________",user)
+        if user["email"] == data.email and user["password"]== data.password:
+            return True
+    return False        

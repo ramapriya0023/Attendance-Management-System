@@ -1,33 +1,81 @@
-from fastapi import APIRouter, Query
-from models.User import User
-from models.User import ResponseModel
-from models.User import UpdateUser
+from fastapi import APIRouter, Body, Depends
+from fastapi.encoders import jsonable_encoder
+from auth.auth_bearer import JWTBearer
+from auth.auth_handler import signJWT
 
-from config.db import userdb
-from schemas.leaveschema import serializeDict, serializeList
-from bson import ObjectId
-user = APIRouter()
+from schemas.userSchema import (
+    add_user,
+    delete_user,
+    retrieve_user,
+    retrieve_users,
+    update_user,
+    check_user
+)
+from models.User import (
+    ErrorResponseModel,
+    ResponseModel,
+    UpdateUser,
+    User,UserLoginSchema
+)
 
-@user.post('/newuser')
-async def new_user(usr: User):
-    userdb.insert_one(dict(usr))
-    data={"hi":"hello"}
-    return ResponseModel(data,"New user added!")
+router = APIRouter()
 
-@user.get('user/{id}')
-async def get_user(id):
-    return serializeDict(userdb.find_one({"_id":ObjectId(id)}))
 
-# @user.put('user/{id}')
-# async def approve_leave(id,status: str):
-#     userdb.find_one_and_update({"_id":ObjectId(id)},{ "$set":{"status": status}})
-#     return "Leave has been Approved"
+@router.post("/", response_description="user data added into the database")
+def add_user_data(user: User = Body(...)):
+    user = jsonable_encoder(user)
+    new_user =  add_user(user)
+    return ResponseModel(new_user, "user added successfully.")
 
-@user.get('/allusers')
-async def allusers():
-    return serializeList(userdb.find())
 
-@user.delete('user/{id}')
-async def delete_user():
-    userdb.find_one_and_delete({"_id":ObjectId(id)})
-    return "User has been deleted."
+@router.get("/", response_description="users retrieved" ,dependencies=[Depends(JWTBearer())], tags=["posts"])
+def get_users():
+    users =  retrieve_users()
+    if users:
+        return ResponseModel(users, "users data retrieved successfully")
+    return ResponseModel(users, "Empty list returned")
+
+
+@router.get("/{id}", response_description="user data retrieved")
+def get_user_data(id):
+    user =  retrieve_user(id)
+    if user:
+        return ResponseModel(user, "user data retrieved successfully")
+    return ErrorResponseModel("An error occurred.", 404, "user doesn't exist.")
+
+
+@router.put("/{id}")
+def update_user_data(id: str, req: UpdateUser = Body(...)):
+    req = {k: v for k, v in req.dict().items() if v is not None}
+    updated_user =  update_user(id, req)
+    if updated_user:
+        return ResponseModel(
+            "user with ID: {} name update is successful".format(id),
+            "user name updated successfully",
+        )
+    return ErrorResponseModel(
+        "An error occurred",
+        404,
+        "There was an error updating the user data.",
+    )
+
+
+@router.delete("/{id}", response_description="user data deleted from the database")
+def delete_user_data(id: str):
+    deleted_user =  delete_user(id)
+    if deleted_user:
+        return ResponseModel(
+            "user with ID: {} removed".format(id), "user deleted successfully"
+        )
+    return ErrorResponseModel(
+        "An error occurred", 404, "user with id {0} doesn't exist".format(id)
+    )
+
+
+@router.post("/user/login", tags=["user"])
+async def user_login(user: UserLoginSchema = Body(...)):
+    if check_user(user):
+        return signJWT(user.email)
+    return {
+        "error": "Wrong login details!"
+    }
