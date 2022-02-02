@@ -30,7 +30,9 @@ class UpdateUser(BaseModel):
     experiance: Optional[int ]
     status:Optional[boolean]
   
-
+class UserLoginSchema(BaseModel):
+    email: EmailStr = Field(...)
+    password: str = Field(...)
    
 
 
