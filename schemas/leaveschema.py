@@ -1,18 +1,18 @@
 import logging
-from tokenize import Triple
 from config.db import leavereportdb
 from config.db import leavedb
-
+logging.basicConfig(level=logging.INFO)
 def leaveEntity(item) -> dict:
     return {
-        "autoid":str(item["autoid"]),
+        "empid":str(item["empid"]),
+        "leaveid":str(item["leaveid"]),
         "reason":item["reason"],
         "status":item["status"]
     }
 
 def reportEntity(item) -> dict:
     return{
-        "autoid":str(item["autoid"]),
+        "empid":str(item["empid"]),
         "name": item["name"],
         "paidleave": item["paidleave"],
         "medicalleave": item["medicalleave"],
@@ -34,7 +34,7 @@ def serializeList(entity) -> list:
 
 def createReport(id,name):
     reportdict={}
-    reportdict["autoid"]=id
+    reportdict["empid"]=id
     reportdict["name"]=name
     reportdict["paidleave"]=0
     reportdict["medicalleave"]=0
@@ -44,26 +44,28 @@ def createReport(id,name):
 
 def updateReport(id,reason):
     logging.info("Updating the report")
-    empreport=leavereportdb.find_one({"autoid":id})
+    empreport=leavereportdb.find_one({"empid":id})
     empreport=dict(empreport)
     for key,value in empreport.items():
         if key==reason:
             num=value+1
-    leavereportdb.find_one_and_update({"autoid":id},{ "$set":{reason:num }})
+    leavereportdb.find_one_and_update({"empid":id},{ "$set":{reason:num }})
 
 def apply_leave(leave):
     logging.info("Applying the leave")
     leavedb.insert_one(leave)
-    updateReport(leave["autoid"],leave["reason"])
+    updateReport(leave["empid"],leave["reason"])
     return leave
 
-def getting_leave(autoid):
-    logging.info("Retrieving the leave")
-    return serializeDict(leavedb.find_one({"autoid":autoid}))
 
-def approving_leave(autoid,status):
+def getting_leave(leaveid):
+    logging.info("Retrieving the leave")
+    return serializeDict(leavedb.find_one({"leaveid":leaveid}))
+    
+
+def approving_leave(leaveid,status):
     logging.info("Approving leave")
-    leave= leavedb.find_one_and_update({"autoid":autoid},{ "$set":{"status": status}})
+    leave= leavedb.find_one_and_update({"leaveid":leaveid},{ "$set":{"status": status}})
     return leave
 
 def get_leaves():
@@ -71,11 +73,11 @@ def get_leaves():
     leaves= serializeList(leavedb.find())
     return leaves
 
-def deleting_leave(autoid):
+def deleting_leave(empid):
     logging.info("Deleting the leave")
-    leavedb.find_one_and_delete({"autoid":autoid})
+    leavedb.find_one_and_delete({"empid":empid})
 
-def generate_report(autoid):
+def generate_report(empid):
     logging.info("Inside report generation")
-    val=leavereportdb.find_one({"autoid":autoid})
+    val=leavereportdb.find_one({"empid":empid})
     return reportEntity(val)
