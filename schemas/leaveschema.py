@@ -73,9 +73,17 @@ def get_leaves():
     leaves= serializeList(leavedb.find())
     return leaves
 
-def deleting_leave(empid):
+def deleting_leave(leaveid):
     logging.info("Deleting the leave")
-    leavedb.find_one_and_delete({"empid":empid})
+    empid=leaveid[:leaveid.index("l")]
+    leave=leavedb.find_one({"leaveid":leaveid})
+    report=leavereportdb.find_one({"empid":empid})
+    leave=dict(leave)
+    report=dict(report)
+    reason=leave["reason"]
+    val=report[reason]-1
+    leavereportdb.find_one_and_update({"empid":empid},{ "$set":{reason:val }})
+    leavedb.find_one_and_delete({"leaveid":leaveid})
 
 def generate_report(empid):
     logging.info("Inside report generation")

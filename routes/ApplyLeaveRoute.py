@@ -48,8 +48,8 @@ async def approve_leave(leaveid,status: str):
             "There was an error approving the leave.",
         ) 
 
-@leaveroute.get('/viewleaves')
-async def view_leaves():
+@leaveroute.get('/leaveresponses')
+async def leave_responses():
     leaves=get_leaves()
     if (leaves):
         return ResponseModel(leavesEntity(leaves), "leaves in the database retrieved successfully.")
@@ -64,7 +64,7 @@ async def view_leaves():
 async def delete_leave(leaveid):
     if(leavedb.find_one({"leaveid":leaveid})):
         deleting_leave(leaveid)
-        return ResponseModel("Leave id {}".format(leaveid),"has been deleted successfully.")
+        return ResponseModel("Leave id {} has been deleted successfully.".format(leaveid),"Leave deleted successfully.")
     else: 
         return ErrorResponseModel(
             "An error occurred",
