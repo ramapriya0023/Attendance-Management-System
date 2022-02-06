@@ -1,7 +1,11 @@
+#author Ramapriya R
+
 import logging
 from config.db import leavereportdb
 from config.db import leavedb
+
 logging.basicConfig(level=logging.INFO)
+
 def leaveEntity(item) -> dict:
     return {
         "empid":str(item["empid"]),
